@@ -32,8 +32,6 @@ st.set_page_config(
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
-VIDEO_PATH = STATIC_DIR / "milo_intro.mp4"
-VIDEO_ALT_PATH = STATIC_DIR / "milo_intro_2.mp4"
 MUSIC_PATH = STATIC_DIR / "milo_music.mp3"
 
 initialize_memory()
@@ -44,17 +42,8 @@ st.session_state.setdefault("quick_prompt", None)
 
 
 # ============================================================
-# MEDIA LOADERS (STATIC SERVING FOR VIDEO + CACHED BASE64 MP3)
+# MEDIA LOADER (CACHED BASE64 MP3)
 # ============================================================
-
-@st.cache_data(show_spinner=False)
-def get_video_source(primary_path_str: str, alt_path_str: str) -> str | None:
-    for path_str in (primary_path_str, alt_path_str):
-        path = Path(path_str)
-        if path.is_file():
-            return f"/app/static/{path.name}"
-    return None
-
 
 @st.cache_data(show_spinner=False)
 def get_music_source(music_path_str: str) -> str | None:
@@ -102,7 +91,7 @@ def handle_user_prompt(question: str):
 
 
 # ============================================================
-# DESIGN SYSTEM & 3D HOLOGRAPHIC RADAR HUD THEME
+# DESIGN SYSTEM & FULL-SCREEN 3D HOLOGRAPHIC RADAR HUD THEME
 # ============================================================
 
 st.html("""
@@ -148,32 +137,209 @@ html, body, [class*="css"] {
 }
 
 /* ============================================================
-   LOOPING CINEMATIC BACKGROUND VIDEO
+   FULL-SCREEN 3D HOLOGRAPHIC RADAR RINGS BACKGROUND
    ============================================================ */
-.milo-background {
+.milo-radar-bg {
     position: fixed;
     inset: 0;
     z-index: 0;
     overflow: hidden;
-    background: var(--dark);
+    background-color: #05060b;
+    background-image:
+        radial-gradient(ellipse at 50% 50%, rgba(0, 229, 255, 0.13) 0%, rgba(255, 48, 79, 0.10) 40%, rgba(5, 6, 11, 0.96) 82%),
+        linear-gradient(rgba(0, 229, 255, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.055) 1px, transparent 1px);
+    background-size: 100% 100%, 46px 46px, 46px 46px;
     pointer-events: none;
 }
 
-.milo-background video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.48;
-    filter: contrast(1.06) saturate(1.1);
+/* Full-Viewport Centered 3D Perspective Stage */
+.milo-bg-stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 155vmax;
+    height: 155vmax;
+    transform: translate(-50%, -50%) perspective(920px) rotateX(56deg);
+    transform-style: preserve-3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* Concentric Topographic Radar Rings spanning full screen */
+.milo-bg-ring {
+    position: absolute;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.milo-bg-ring-1 {
+    width: 24vmax;
+    height: 24vmax;
+    border: 1.5px solid rgba(0, 229, 255, 0.42);
+    box-shadow: 0 0 32px rgba(0, 229, 255, 0.24), inset 0 0 24px rgba(0, 229, 255, 0.16);
+    animation: bgSpinCW 18s linear infinite;
+}
+
+.milo-bg-ring-2 {
+    width: 44vmax;
+    height: 44vmax;
+    border: 2px dashed rgba(255, 48, 79, 0.36);
+    box-shadow: 0 0 40px rgba(255, 48, 79, 0.16);
+    animation: bgSpinCCW 28s linear infinite;
+}
+
+.milo-bg-ring-3 {
+    width: 68vmax;
+    height: 68vmax;
+    border: 1.5px solid rgba(0, 229, 255, 0.26);
+    border-top-color: rgba(255, 48, 79, 0.52);
+    border-bottom-color: rgba(0, 229, 255, 0.58);
+    animation: bgSpinCW 38s linear infinite;
+}
+
+.milo-bg-ring-4 {
+    width: 94vmax;
+    height: 94vmax;
+    border: 2px dashed rgba(0, 229, 255, 0.20);
+    animation: bgSpinCCW 52s linear infinite;
+}
+
+.milo-bg-ring-5 {
+    width: 124vmax;
+    height: 124vmax;
+    border: 1px solid rgba(255, 48, 79, 0.22);
+    border-left-color: rgba(0, 229, 255, 0.42);
+    border-right-color: rgba(255, 48, 79, 0.42);
+    animation: bgSpinCW 68s linear infinite;
+}
+
+/* Full-Screen Sweeping Conic Radar Beam */
+.milo-bg-sweep {
+    position: absolute;
+    width: 128vmax;
+    height: 128vmax;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    background: conic-gradient(
+        from 0deg,
+        rgba(0, 229, 255, 0.26) 0deg,
+        rgba(0, 229, 255, 0.08) 28deg,
+        rgba(255, 48, 79, 0.06) 55deg,
+        transparent 110deg,
+        transparent 360deg
+    );
+    animation: bgSweep 9s linear infinite;
+}
+
+/* Expanding Pulse Wave */
+.milo-bg-pulse {
+    position: absolute;
+    width: 30vmax;
+    height: 30vmax;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    border: 2px solid rgba(0, 229, 255, 0.45);
+    animation: bgRadarPulse 5.5s ease-out infinite;
+}
+
+.milo-bg-pulse-red {
+    position: absolute;
+    width: 30vmax;
+    height: 30vmax;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    border: 2px solid rgba(255, 48, 79, 0.42);
+    animation: bgRadarPulse 5.5s ease-out 2.75s infinite;
+}
+
+/* Glowing Target Nodes Across Both Left & Right Sides */
+.milo-bg-node {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.milo-node-cyan-1 {
+    top: 22%;
+    left: 24%;
+    background: var(--cyan);
+    box-shadow: 0 0 18px var(--cyan), 0 0 36px var(--cyan);
+    animation: nodeBlink 3.2s ease-in-out infinite;
+}
+
+.milo-node-cyan-2 {
+    top: 74%;
+    left: 72%;
+    background: var(--cyan);
+    box-shadow: 0 0 18px var(--cyan), 0 0 36px var(--cyan);
+    animation: nodeBlink 4.1s ease-in-out 1.1s infinite;
+}
+
+.milo-node-red-1 {
+    top: 30%;
+    left: 78%;
+    background: var(--red);
+    box-shadow: 0 0 20px var(--red), 0 0 40px var(--red);
+    animation: nodeBlink 3.6s ease-in-out 0.6s infinite;
+}
+
+.milo-node-red-2 {
+    top: 76%;
+    left: 22%;
+    background: var(--red);
+    box-shadow: 0 0 20px var(--red), 0 0 40px var(--red);
+    animation: nodeBlink 4.4s ease-in-out 1.9s infinite;
+}
+
+/* Crosshair & HUD Corner Telemetry Framing the Full Screen */
+.milo-bg-crosshair-h {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 229, 255, 0.22) 25%, rgba(255, 48, 79, 0.28) 50%, rgba(0, 229, 255, 0.22) 75%, transparent 100%);
+}
+
+.milo-bg-crosshair-v {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 229, 255, 0.22) 25%, rgba(255, 48, 79, 0.28) 50%, rgba(0, 229, 255, 0.22) 75%, transparent 100%);
+}
+
+.milo-hud-corner {
+    position: fixed;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.4px;
+    color: rgba(0, 229, 255, 0.34);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.milo-corner-tr { top: 22px; right: 28px; }
+.milo-corner-br { bottom: 20px; right: 28px; color: rgba(255, 48, 79, 0.38); }
+.milo-corner-bl { bottom: 20px; left: 28px; }
+
+/* Subtle Vignette for Crisp Text Contrast */
 .milo-overlay {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 75% 45%, rgba(255, 48, 79, 0.09), transparent 55%),
-        linear-gradient(90deg, rgba(6, 6, 10, 0.94) 0%, rgba(6, 6, 10, 0.62) 55%, rgba(6, 6, 10, 0.38) 100%),
-        linear-gradient(0deg, #07070b 0%, transparent 65%);
+        radial-gradient(circle at 50% 50%, transparent 32%, rgba(4, 5, 9, 0.72) 100%),
+        linear-gradient(90deg, rgba(5, 6, 10, 0.62) 0%, rgba(5, 6, 10, 0.24) 55%, rgba(5, 6, 10, 0.35) 100%);
 }
 
 /* ============================================================
@@ -809,6 +975,37 @@ div[data-testid="stChatInput"] button:hover {
 /* ============================================================
    KEYFRAMES & 3D ANIMATIONS
    ============================================================ */
+@keyframes bgSpinCW {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes bgSpinCCW {
+    0% { transform: translate(-50%, -50%) rotate(360deg); }
+    100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+@keyframes bgSweep {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes bgRadarPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.35);
+        opacity: 0.85;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3.8);
+        opacity: 0;
+    }
+}
+
+@keyframes nodeBlink {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.7); opacity: 0.3; }
+}
+
 @keyframes entrance {
     from { opacity: 0; transform: translateY(22px); }
     to { opacity: 1; transform: translateY(0); }
@@ -888,7 +1085,7 @@ div[data-testid="stChatInput"] button:hover {
         max-width: 86% !important;
     }
 
-    .milo-telemetry-row {
+    .milo-telemetry-row, .milo-hud-corner {
         display: none;
     }
 }
@@ -897,31 +1094,33 @@ div[data-testid="stChatInput"] button:hover {
 
 
 # ============================================================
-# VIDEO BACKGROUND (CONTINUOUS LOOP + CHROME AUTOPLAY TRIGGER)
+# FULL-SCREEN HOLOGRAPHIC RADAR BACKGROUND
 # ============================================================
 
-video_src = get_video_source(str(VIDEO_PATH), str(VIDEO_ALT_PATH))
-
-if video_src:
-    st.html(f"""
-    <div class="milo-background">
-        <video id="milo-bg-vid" src="{video_src}" autoplay muted loop playsinline preload="auto"></video>
-        <div class="milo-overlay"></div>
+st.html("""
+<div class="milo-radar-bg">
+    <div class="milo-bg-crosshair-h"></div>
+    <div class="milo-bg-crosshair-v"></div>
+    <div class="milo-bg-stage">
+        <div class="milo-bg-sweep"></div>
+        <div class="milo-bg-pulse"></div>
+        <div class="milo-bg-pulse-red"></div>
+        <div class="milo-bg-ring milo-bg-ring-1"></div>
+        <div class="milo-bg-ring milo-bg-ring-2"></div>
+        <div class="milo-bg-ring milo-bg-ring-3"></div>
+        <div class="milo-bg-ring milo-bg-ring-4"></div>
+        <div class="milo-bg-ring milo-bg-ring-5"></div>
+        <div class="milo-bg-node milo-node-cyan-1"></div>
+        <div class="milo-bg-node milo-node-cyan-2"></div>
+        <div class="milo-bg-node milo-node-red-1"></div>
+        <div class="milo-bg-node milo-node-red-2"></div>
     </div>
-    """)
-    components.html("""
-    <script>
-        const vid = window.parent.document.getElementById("milo-bg-vid");
-        if (vid) {
-            vid.muted = true;
-            vid.play().catch(() => {});
-        }
-    </script>
-    """, height=0)
-else:
-    st.sidebar.warning(
-        f"Background video not found: {VIDEO_PATH} or {VIDEO_ALT_PATH}"
-    )
+    <div class="milo-overlay"></div>
+</div>
+<div class="milo-hud-corner milo-corner-tr">RADAR GRID // 360° ACTIVE</div>
+<div class="milo-hud-corner milo-corner-bl">SECTOR 01 · NEURAL FIELD</div>
+<div class="milo-hud-corner milo-corner-br">SCAN HZ · 234.8</div>
+""")
 
 
 # ============================================================
