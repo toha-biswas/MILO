@@ -3,37 +3,28 @@ import streamlit as st
 
 
 def initialize_memory():
-    """Initialize MILO's session memory."""
+    defaults = {
+        "messages": [],
+        "document_text": "",
+        "document_name": None,
+        "chat_mode": "General Chat",
+    }
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-
-    if "document_text" not in st.session_state:
-        st.session_state.document_text = ""
-
-    if "document_name" not in st.session_state:
-        st.session_state.document_name = None
-
-    if "chat_mode" not in st.session_state:
-        st.session_state.chat_mode = "General Chat"
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
 
 
 def add_message(role, content):
-    """Save a conversation message."""
-
     st.session_state.messages.append({
         "role": role,
-        "content": content
+        "content": content,
     })
 
 
 def get_chat_history(limit=10):
-    """Return recent conversation history."""
-
     return st.session_state.messages[-limit:]
 
 
 def clear_chat():
-    """Clear conversation history."""
-
     st.session_state.messages = []

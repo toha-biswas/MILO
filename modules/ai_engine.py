@@ -4,24 +4,22 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
 
 
-# MILO model priority
 MODELS = [
     "openai/gpt-oss-20b",
     "qwen/qwen3.8-27b",
     "openai/gpt-oss-120b",
 ]
 
-# MILO response style
 SYSTEM_PROMPT = """
-You are MILO, a helpful personal AI assistant.
+You are MILO, a friendly and intelligent personal AI assistant.
 
-Instructions:
-- Give short, clear and simple answers.
-- Use bullet points when helpful.
-- Avoid unnecessary explanations.
-- Keep answers around 3-6 sentences.
-- Give more detail when the user asks.
-- Be friendly and natural.
+Rules:
+- Give clear, natural and helpful answers.
+- Explain difficult concepts simply.
+- Help with Python, C, AI and data science.
+- Use headings and bullets when helpful.
+- Keep simple answers concise.
+- Never invent information.
 """
 
 
@@ -36,21 +34,34 @@ def get_ai_model(model_name):
 
 
 def get_ai_response(prompt):
+    """Generate an AI response with model fallback."""
+
+    errors = []
+
     for model_name in MODELS:
         try:
             model = get_ai_model(model_name)
 
             response = model.invoke([
                 SystemMessage(content=SYSTEM_PROMPT),
-                HumanMessage(content=str(prompt))
+                HumanMessage(content=str(prompt)),
             ])
 
-            print(f"MILO SUCCESS: {model_name}")
-            return response.content
+            answer = response.content
 
-        except Exception as e:
-            error = str(e).lower()
-            print(f"MILO ERROR ({model_name}): {e}")
+            if isinstance(answer, str) and answer.strip():
+                print(f"MILO SUCCESS: {model_name}")
+                return answer
+
+            errors.append(f"{model_name}: Empty response")
+
+        except Exception as exc:
+            error_message = str(exc)
+            print(f"MILO ERROR ({model_name}): {error_message}")
+
+            errors.append(f"{model_name}: {error_message}")
+
+            error_lower = error_message.lower()
 
             fallback_errors = [
                 "429",
@@ -60,15 +71,19 @@ def get_ai_response(prompt):
                 "503",
                 "service unavailable",
                 "overloaded",
+                "model_decommissioned",
+                "model not found",
+                "does not exist",
+                "not supported",
             ]
 
-            if any(item in error for item in fallback_errors):
+            if any(item in error_lower for item in fallback_errors):
                 continue
 
-            return f"MILO AI Error: {e}"
+            return f"MILO AI Error: {error_message}"
 
     return (
-        "MILO is temporarily busy. "
-        "Please try again in a little while."
+        "MILO is temporarily unable to respond. "
+        "Please check your Groq model availability and API limits, "
+        "then try again."
     )
-
