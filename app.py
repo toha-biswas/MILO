@@ -1,4 +1,5 @@
 import base64
+import html
 from pathlib import Path
 
 import streamlit as st
@@ -42,7 +43,7 @@ st.session_state.setdefault("quick_prompt", None)
 
 
 # ============================================================
-# MEDIA LOADERS (CACHED BASE64 + STATIC FALLBACK)
+# MEDIA LOADERS (STATIC SERVING FOR VIDEO + CACHED BASE64 MP3)
 # ============================================================
 
 @st.cache_data(show_spinner=False)
@@ -50,9 +51,6 @@ def get_video_source(video_path_str: str) -> str | None:
     path = Path(video_path_str)
     if not path.is_file():
         return None
-    if path.stat().st_size <= 25 * 1024 * 1024:
-        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
-        return f"data:video/mp4;base64,{encoded}"
     return "/app/static/milo_intro.mp4"
 
 
@@ -102,7 +100,7 @@ def handle_user_prompt(question: str):
 
 
 # ============================================================
-# DESIGN SYSTEM & CYBER-AURA CHAT THEME
+# DESIGN SYSTEM & 3D HOLOGRAPHIC RADAR HUD THEME
 # ============================================================
 
 st.html("""
@@ -113,6 +111,7 @@ st.html("""
     --red: #ff304f;
     --pink: #ff5c7c;
     --crimson-deep: #b81131;
+    --cyan: #00e5ff;
     --dark: #07070b;
     --panel: #0e0e14;
     --border: rgba(255, 255, 255, 0.08);
@@ -328,7 +327,7 @@ div[role="dialog"] .stButton > button {
 }
 
 div[role="dialog"] .stButton > button:hover {
-    background: linear-gradient(120deg, rgba(255, 48, 79, 0.24), rgba(184, 17, 49, 0.22));
+    background: linear-gradient(120deg, rgba(255, 48, 79, 0.24), rgba(0, 229, 255, 0.14));
     border-color: var(--pink);
     color: #ffffff;
     transform: translateY(-1px);
@@ -340,8 +339,8 @@ div[role="dialog"] .stButton > button:hover {
    ============================================================ */
 div[data-testid="stDialog"] > div[role="dialog"] {
     background:
-        radial-gradient(circle at 50% 42%, rgba(255, 48, 79, 0.09) 0%, transparent 62%),
-        rgba(10, 10, 15, 0.97) !important;
+        radial-gradient(circle at 50% 42%, rgba(255, 48, 79, 0.09) 0%, rgba(0, 229, 255, 0.04) 45%, transparent 70%),
+        rgba(9, 10, 15, 0.97) !important;
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
     border: 1px solid rgba(255, 255, 255, 0.09) !important;
@@ -377,7 +376,7 @@ div[role="dialog"] [data-testid="stDialogHeader"] h2 {
     gap: 10px;
     padding: 9px 14px;
     margin-bottom: 8px;
-    background: linear-gradient(90deg, rgba(255, 48, 79, 0.08), rgba(255, 255, 255, 0.02));
+    background: linear-gradient(90deg, rgba(255, 48, 79, 0.09), rgba(0, 229, 255, 0.04), rgba(255, 255, 255, 0.02));
     border: 1px solid var(--border);
     border-radius: 12px;
 }
@@ -410,9 +409,9 @@ div[role="dialog"] [data-testid="stDialogHeader"] h2 {
     gap: 6px;
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    color: #d6d6e0;
+    background: rgba(0, 229, 255, 0.09);
+    border: 1px solid rgba(0, 229, 255, 0.28);
+    color: #9beeff;
     font-size: 11.5px;
     font-weight: 500;
 }
@@ -433,23 +432,23 @@ div[role="dialog"] [data-testid="stDialogHeader"] h2 {
 }
 
 /* ============================================================
-   CYBER-NEURAL AURA ARENA (CHAT VIEWPORT THEME)
+   3D HOLOGRAPHIC RADAR HUD ARENA (CHAT VIEWPORT THEME)
    ============================================================ */
 div[role="dialog"] div[data-testid="stVerticalBlockBorderWrapper"] {
     position: relative;
     overflow: hidden;
     border-radius: 16px !important;
-    border: 1px solid rgba(255, 48, 79, 0.22) !important;
-    background-color: #08080d !important;
+    border: 1px solid rgba(255, 48, 79, 0.25) !important;
+    background-color: #06070c !important;
     background-image:
-        radial-gradient(circle at 50% 50%, rgba(255, 48, 79, 0.13) 0%, rgba(184, 17, 49, 0.04) 40%, transparent 72%),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 4px),
-        linear-gradient(rgba(255, 48, 79, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 48, 79, 0.045) 1px, transparent 1px) !important;
-    background-size: 100% 100%, 100% 4px, 32px 32px, 32px 32px !important;
+        radial-gradient(ellipse at 50% 52%, rgba(0, 229, 255, 0.11) 0%, rgba(255, 48, 79, 0.10) 36%, transparent 72%),
+        repeating-radial-gradient(circle at 50% 52%, rgba(0, 229, 255, 0.07) 0px, rgba(0, 229, 255, 0.07) 1px, transparent 1px, transparent 22px),
+        linear-gradient(rgba(255, 48, 79, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.035) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px !important;
     box-shadow:
-        inset 0 0 55px rgba(0, 0, 0, 0.85),
-        inset 0 0 24px rgba(255, 48, 79, 0.08) !important;
+        inset 0 0 60px rgba(0, 0, 0, 0.88),
+        inset 0 0 28px rgba(0, 229, 255, 0.06) !important;
     padding: 14px 16px !important;
 }
 
@@ -458,29 +457,30 @@ div[role="dialog"] div[data-testid="stVerticalBlockBorderWrapper"]::before {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 240px;
-    height: 240px;
-    margin-top: -120px;
-    margin-left: -120px;
+    width: 310px;
+    height: 310px;
+    margin-top: -155px;
+    margin-left: -155px;
     border-radius: 50%;
-    border: 1px dashed rgba(255, 48, 79, 0.18);
-    box-shadow: 0 0 45px rgba(255, 48, 79, 0.08);
-    animation: spinSlow 24s linear infinite;
+    border: 1.5px dashed rgba(0, 229, 255, 0.26);
+    box-shadow:
+        0 0 40px rgba(0, 229, 255, 0.10),
+        inset 0 0 30px rgba(255, 48, 79, 0.12);
+    animation: radarOrbit 22s linear infinite;
     pointer-events: none;
     z-index: 0;
 }
 
 div[role="dialog"] div[data-testid="stVerticalBlockBorderWrapper"]::after {
-    content: "MILO // NEURAL CORE";
+    content: "SCANNING // MILO NEURAL RADAR · HZ 234";
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    bottom: 10px;
+    right: 16px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
+    font-size: 9.5px;
     font-weight: 700;
-    letter-spacing: 5px;
-    color: rgba(255, 92, 124, 0.16);
+    letter-spacing: 2.5px;
+    color: rgba(0, 229, 255, 0.24);
     pointer-events: none;
     white-space: nowrap;
     z-index: 0;
@@ -495,88 +495,128 @@ div[role="dialog"] div[data-testid="stVerticalBlockBorderWrapper"] div[data-test
 }
 
 /* ============================================================
-   HOLOGRAPHIC AI CORE (EMPTY STATE)
+   PURE CSS 3D HOLOGRAPHIC HERO CORE (ZERO SVG SANITIZATION RISK)
    ============================================================ */
 .milo-empty-state {
     position: relative;
     text-align: center;
-    padding: 28px 20px 22px 20px;
+    padding: 20px 20px 18px 20px;
     margin: 2px 0;
     border-radius: 18px;
     background:
-        radial-gradient(ellipse at 50% 0%, rgba(255, 48, 79, 0.15), transparent 70%),
-        rgba(13, 13, 19, 0.78);
-    border: 1px solid rgba(255, 48, 79, 0.24);
+        radial-gradient(ellipse at 50% 30%, rgba(0, 229, 255, 0.14), rgba(255, 48, 79, 0.08) 48%, transparent 78%),
+        rgba(10, 12, 18, 0.78);
+    border: 1px solid rgba(0, 229, 255, 0.24);
     backdrop-filter: blur(10px);
     animation: fadeSlideUp 0.45s ease both;
 }
 
-.milo-holo-stage {
+.milo-3d-stage {
     position: relative;
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 14px auto;
+    width: 146px;
+    height: 146px;
+    margin: 0 auto 10px auto;
+    perspective: 750px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.milo-holo-ring-outer {
+.milo-3d-aura {
     position: absolute;
-    inset: 0;
+    width: 112px;
+    height: 112px;
     border-radius: 50%;
-    border: 1.5px dashed rgba(255, 48, 79, 0.52);
-    animation: spinSlow 14s linear infinite;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.26) 0%, rgba(255, 48, 79, 0.14) 52%, transparent 75%);
+    filter: blur(8px);
+    animation: pulseGlow 3s ease-in-out infinite;
 }
 
-.milo-holo-ring-inner {
+/* 3D Tilted Gyroscope Rings */
+.milo-3d-ring {
     position: absolute;
-    inset: 12px;
     border-radius: 50%;
+    transform-style: preserve-3d;
+}
+
+.milo-ring-outer {
+    width: 138px;
+    height: 138px;
+    border: 1.5px dashed rgba(0, 229, 255, 0.58);
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.22);
+    animation: gyro3dA 9s linear infinite;
+}
+
+.milo-ring-mid {
+    width: 112px;
+    height: 112px;
     border: 2px solid transparent;
     border-top-color: var(--red);
     border-bottom-color: var(--pink);
-    box-shadow: 0 0 24px rgba(255, 48, 79, 0.3);
-    animation: spinReverse 5.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    border-left-color: rgba(255, 48, 79, 0.25);
+    box-shadow: 0 0 22px rgba(255, 48, 79, 0.35);
+    animation: gyro3dB 6.5s linear infinite;
 }
 
-.milo-holo-hexagon {
+.milo-ring-inner {
+    width: 84px;
+    height: 84px;
+    border: 1.5px solid transparent;
+    border-left-color: var(--cyan);
+    border-right-color: #ffffff;
+    box-shadow: inset 0 0 14px rgba(0, 229, 255, 0.3);
+    animation: gyro3dC 4.5s linear infinite;
+}
+
+/* 3D Horizontal Radar Disc */
+.milo-radar-disc {
+    position: absolute;
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 229, 255, 0.28);
+    background: conic-gradient(from 0deg, rgba(0, 229, 255, 0.32), rgba(255, 48, 79, 0.12) 45deg, transparent 120deg);
+    animation: radarDiscSpin 3.6s linear infinite;
+}
+
+/* 3D Glowing Core Orb + Equalizer Bars */
+.milo-core-orb {
     position: relative;
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    transform: rotate(45deg);
-    background: linear-gradient(135deg, rgba(255, 48, 79, 0.28), rgba(18, 18, 28, 0.95));
-    border: 1px solid rgba(255, 92, 124, 0.65);
+    z-index: 3;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, #ffffff 0%, #7ceeff 26%, #ff304f 72%, #5e0819 100%);
     box-shadow:
-        0 0 30px rgba(255, 48, 79, 0.45),
-        inset 0 0 14px rgba(255, 48, 79, 0.25);
+        0 0 24px rgba(0, 229, 255, 0.72),
+        0 0 42px rgba(255, 48, 79, 0.55),
+        inset 0 -6px 12px rgba(0, 0, 0, 0.65);
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: coreFloat 3.2s ease-in-out infinite;
 }
 
-.milo-wave-bars {
-    transform: rotate(-45deg);
+.milo-core-bars {
     display: flex;
     align-items: center;
-    gap: 3.5px;
-    height: 20px;
+    gap: 2.5px;
+    height: 16px;
 }
 
-.milo-wave-bars span {
-    width: 3px;
-    border-radius: 999px;
-    background: linear-gradient(180deg, #ffffff, var(--pink), var(--red));
-    box-shadow: 0 0 8px var(--red);
-    animation: eqWave 1.15s ease-in-out infinite;
+.milo-core-bars span {
+    width: 2.5px;
+    border-radius: 99px;
+    background: #ffffff;
+    box-shadow: 0 0 6px #ffffff;
+    animation: coreWave 1s ease-in-out infinite;
 }
 
-.milo-wave-bars span:nth-child(1) { height: 8px; animation-delay: 0.0s; }
-.milo-wave-bars span:nth-child(2) { height: 16px; animation-delay: 0.15s; }
-.milo-wave-bars span:nth-child(3) { height: 20px; animation-delay: 0.3s; }
-.milo-wave-bars span:nth-child(4) { height: 13px; animation-delay: 0.45s; }
-.milo-wave-bars span:nth-child(5) { height: 9px; animation-delay: 0.6s; }
+.milo-core-bars span:nth-child(1) { height: 6px; animation-delay: 0.0s; }
+.milo-core-bars span:nth-child(2) { height: 13px; animation-delay: 0.15s; }
+.milo-core-bars span:nth-child(3) { height: 16px; animation-delay: 0.3s; }
+.milo-core-bars span:nth-child(4) { height: 11px; animation-delay: 0.45s; }
+.milo-core-bars span:nth-child(5) { height: 7px; animation-delay: 0.6s; }
 
 .milo-empty-tag {
     display: inline-block;
@@ -584,8 +624,8 @@ div[role="dialog"] div[data-testid="stVerticalBlockBorderWrapper"] div[data-test
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 2.5px;
-    color: var(--pink);
-    margin-bottom: 5px;
+    color: var(--cyan);
+    margin-bottom: 4px;
 }
 
 .milo-empty-title {
@@ -593,14 +633,14 @@ div[role="dialog"] div[data-testid="stVerticalBlockBorderWrapper"] div[data-test
     font-weight: 800;
     color: #ffffff;
     letter-spacing: -0.3px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .milo-empty-sub {
     font-size: 13px;
     color: var(--text-muted);
     max-width: 460px;
-    margin: 0 auto 4px auto;
+    margin: 0 auto;
     line-height: 1.55;
 }
 
@@ -652,9 +692,9 @@ div[data-testid="stChatMessage"]:has([aria-label*="assistant"]) {
     align-self: flex-start !important;
     margin-right: auto !important;
     margin-left: 0 !important;
-    background: linear-gradient(145deg, rgba(28, 28, 40, 0.94), rgba(18, 18, 26, 0.96)) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-left: 2.5px solid var(--red) !important;
+    background: linear-gradient(145deg, rgba(22, 26, 38, 0.95), rgba(14, 16, 24, 0.97)) !important;
+    border: 1px solid rgba(0, 229, 255, 0.22) !important;
+    border-left: 2.5px solid var(--cyan) !important;
     border-radius: 18px 18px 18px 4px !important;
     backdrop-filter: blur(8px);
 }
@@ -765,7 +805,7 @@ div[data-testid="stChatInput"] button:hover {
 }
 
 /* ============================================================
-   KEYFRAMES & RESPONSIVENESS
+   KEYFRAMES & 3D ANIMATIONS
    ============================================================ */
 @keyframes entrance {
     from { opacity: 0; transform: translateY(22px); }
@@ -787,18 +827,38 @@ div[data-testid="stChatInput"] button:hover {
     50% { opacity: 0.65; transform: scale(0.92); }
 }
 
-@keyframes spinSlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+@keyframes radarOrbit {
+    0% { transform: perspective(520px) rotateX(58deg) rotateZ(0deg); }
+    100% { transform: perspective(520px) rotateX(58deg) rotateZ(360deg); }
 }
 
-@keyframes spinReverse {
-    from { transform: rotate(360deg); }
-    to { transform: rotate(0deg); }
+@keyframes radarDiscSpin {
+    0% { transform: rotateX(64deg) rotateZ(0deg); }
+    100% { transform: rotateX(64deg) rotateZ(360deg); }
 }
 
-@keyframes eqWave {
-    0%, 100% { transform: scaleY(0.45); opacity: 0.75; }
+@keyframes gyro3dA {
+    0% { transform: rotateX(62deg) rotateY(16deg) rotateZ(0deg); }
+    100% { transform: rotateX(62deg) rotateY(16deg) rotateZ(360deg); }
+}
+
+@keyframes gyro3dB {
+    0% { transform: rotateX(-55deg) rotateY(32deg) rotateZ(360deg); }
+    100% { transform: rotateX(-55deg) rotateY(32deg) rotateZ(0deg); }
+}
+
+@keyframes gyro3dC {
+    0% { transform: rotateX(28deg) rotateY(-64deg) rotateZ(0deg); }
+    100% { transform: rotateX(28deg) rotateY(-64deg) rotateZ(360deg); }
+}
+
+@keyframes coreFloat {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-4px) scale(1.06); }
+}
+
+@keyframes coreWave {
+    0%, 100% { transform: scaleY(0.45); opacity: 0.78; }
     50% { transform: scaleY(1.15); opacity: 1; }
 }
 
@@ -856,7 +916,7 @@ else:
 
 
 # ============================================================
-# PERSISTENT HTML5 AUDIO ENGINE (static/milo_music.mp3)
+# PERSISTENT HTML5 AUDIO ENGINE (18s AUTO-STOP + SMOOTH FADE)
 # ============================================================
 
 def render_persistent_music_controller():
@@ -1020,7 +1080,7 @@ def render_persistent_music_controller():
             <div class="header-row">
                 <div class="track-info">
                     <div class="eq"><span></span><span></span><span></span><span></span></div>
-                    <div class="track-name" title="milo_music.mp3">milo_music.mp3</div>
+                    <div class="track-name" title="milo_music.mp3 (18s Intro)">milo_music.mp3</div>
                 </div>
                 <span id="statusBadge" class="status-pill">STANDBY</span>
             </div>
@@ -1039,6 +1099,7 @@ def render_persistent_music_controller():
             const musicSrc = {repr(music_src)};
             const parentDoc = window.parent.document;
             const parentWin = window.parent;
+            const MAX_PLAY_MS = 18000;
 
             const deck = document.getElementById("deck");
             const enableBanner = document.getElementById("enableBanner");
@@ -1052,11 +1113,43 @@ def render_persistent_music_controller():
                 audio = parentDoc.createElement("audio");
                 audio.id = "milo-persistent-audio";
                 audio.src = musicSrc;
-                audio.loop = true;
+                audio.loop = false;
                 audio.preload = "auto";
                 audio.volume = 0.45;
                 audio.style.display = "none";
                 parentDoc.body.appendChild(audio);
+            }}
+
+            function clearStopTimers() {{
+                if (parentWin.__miloStopTimer) {{
+                    clearTimeout(parentWin.__miloStopTimer);
+                    parentWin.__miloStopTimer = null;
+                }}
+                if (parentWin.__miloFadeInterval) {{
+                    clearInterval(parentWin.__miloFadeInterval);
+                    parentWin.__miloFadeInterval = null;
+                }}
+            }}
+
+            function scheduleAutoOff() {{
+                clearStopTimers();
+                audio.volume = 0.45;
+
+                parentWin.__miloStopTimer = setTimeout(() => {{
+                    parentWin.__miloFadeInterval = setInterval(() => {{
+                        if (audio.volume > 0.05) {{
+                            audio.volume = Math.max(0, audio.volume - 0.05);
+                        }} else {{
+                            clearStopTimers();
+                            audio.pause();
+                            audio.currentTime = 0;
+                            audio.volume = 0.45;
+                            parentWin.__miloUserPaused = true;
+                            parentWin.__miloAutoStopped = true;
+                            updateUI();
+                        }}
+                    }}, 150);
+                }}, MAX_PLAY_MS - 1500);
             }}
 
             function updateUI() {{
@@ -1066,19 +1159,23 @@ def render_persistent_music_controller():
                 if (isPlaying) {{
                     deck.classList.add("is-playing");
                     playPauseBtn.textContent = "⏸ Pause";
-                    statusBadge.textContent = isMuted ? "MUTED" : "PLAYING";
+                    statusBadge.textContent = isMuted ? "MUTED" : "18S LIVE";
                     enableBanner.style.display = "none";
                 }} else {{
                     deck.classList.remove("is-playing");
                     playPauseBtn.textContent = "▶ Play";
-                    statusBadge.textContent = parentWin.__miloUserPaused ? "PAUSED" : "BLOCKED";
+                    if (parentWin.__miloAutoStopped) {{
+                        statusBadge.textContent = "AUTO OFF";
+                    }} else {{
+                        statusBadge.textContent = parentWin.__miloUserPaused ? "PAUSED" : "BLOCKED";
+                    }}
                 }}
 
                 muteBtn.textContent = isMuted ? "🔇 Unmute" : "🔊 Mute";
             }}
 
             function attemptAutoplay() {{
-                if (parentWin.__miloUserPaused) {{
+                if (parentWin.__miloUserPaused || parentWin.__miloAutoStopped) {{
                     updateUI();
                     return;
                 }}
@@ -1093,6 +1190,7 @@ def render_persistent_music_controller():
                     playPromise
                         .then(() => {{
                             enableBanner.style.display = "none";
+                            scheduleAutoOff();
                             updateUI();
                         }})
                         .catch(() => {{
@@ -1104,10 +1202,13 @@ def render_persistent_music_controller():
 
             function enableAndPlay() {{
                 parentWin.__miloUserPaused = false;
+                parentWin.__miloAutoStopped = false;
                 audio.muted = false;
+                audio.currentTime = 0;
                 audio.play()
                     .then(() => {{
                         enableBanner.style.display = "none";
+                        scheduleAutoOff();
                         updateUI();
                     }})
                     .catch(updateUI);
@@ -1118,8 +1219,16 @@ def render_persistent_music_controller():
             playPauseBtn.addEventListener("click", () => {{
                 if (audio.paused) {{
                     parentWin.__miloUserPaused = false;
-                    audio.play().then(updateUI).catch(updateUI);
+                    parentWin.__miloAutoStopped = false;
+                    if (audio.currentTime >= 17.5 || audio.ended) {{
+                        audio.currentTime = 0;
+                    }}
+                    audio.play().then(() => {{
+                        scheduleAutoOff();
+                        updateUI();
+                    }}).catch(updateUI);
                 }} else {{
+                    clearStopTimers();
                     parentWin.__miloUserPaused = true;
                     audio.pause();
                     updateUI();
@@ -1131,6 +1240,12 @@ def render_persistent_music_controller():
                 updateUI();
             }});
 
+            audio.addEventListener("ended", () => {{
+                clearStopTimers();
+                parentWin.__miloAutoStopped = true;
+                parentWin.__miloUserPaused = true;
+                updateUI();
+            }});
             audio.addEventListener("play", updateUI);
             audio.addEventListener("pause", updateUI);
             audio.addEventListener("volumechange", updateUI);
@@ -1138,8 +1253,11 @@ def render_persistent_music_controller():
             if (!parentWin.__miloGestureHooked) {{
                 parentWin.__miloGestureHooked = true;
                 parentDoc.addEventListener("pointerdown", () => {{
-                    if (audio.paused && !parentWin.__miloUserPaused) {{
-                        audio.play().then(updateUI).catch(() => {{}});
+                    if (audio.paused && !parentWin.__miloUserPaused && !parentWin.__miloAutoStopped) {{
+                        audio.play().then(() => {{
+                            scheduleAutoOff();
+                            updateUI();
+                        }}).catch(() => {{}});
                     }}
                 }}, {{ once: true }});
             }}
@@ -1222,16 +1340,16 @@ with st.sidebar:
 
 @st.dialog("MILO  /  AI WORKSPACE", width="large")
 def milo_chat_dialog():
-    # Process any triggered one-click quick action first
     pending_prompt = st.session_state.pop("quick_prompt", None)
     if pending_prompt:
         handle_user_prompt(pending_prompt)
         st.rerun()
 
     mode_label = st.session_state.chat_mode.upper()
-    doc_name = st.session_state.get("document_name", "")
+    doc_name = st.session_state.get("document_name") or ""
+    safe_doc_name = html.escape(doc_name)
     doc_badge = (
-        f'<span class="milo-doc-badge">📄 {doc_name}</span>'
+        f'<span class="milo-doc-badge">📄 {safe_doc_name}</span>'
         if st.session_state.chat_mode == "Document Chat" and doc_name
         else ""
     )
@@ -1243,14 +1361,13 @@ def milo_chat_dialog():
             {doc_badge}
         </div>
         <div class="milo-telemetry-row">
+            <span>RADAR // <b>SYNCED</b></span>
             <span>CORE // <b>MILO-V4</b></span>
-            <span>STATUS // <b>ONLINE</b></span>
             <span>LINK // <b>ENCRYPTED</b></span>
         </div>
     </div>
     """)
 
-    # One-Click Quick Access Bar (always accessible above chat)
     qa1, qa2, qa3 = st.columns(3)
     with qa1:
         if st.button("✦ Instant Answers", key="qa_instant", use_container_width=True):
@@ -1287,11 +1404,14 @@ def milo_chat_dialog():
         if not history:
             st.html("""
             <div class="milo-empty-state">
-                <div class="milo-holo-stage">
-                    <div class="milo-holo-ring-outer"></div>
-                    <div class="milo-holo-ring-inner"></div>
-                    <div class="milo-holo-hexagon">
-                        <div class="milo-wave-bars">
+                <div class="milo-3d-stage">
+                    <div class="milo-3d-aura"></div>
+                    <div class="milo-radar-disc"></div>
+                    <div class="milo-3d-ring milo-ring-outer"></div>
+                    <div class="milo-3d-ring milo-ring-mid"></div>
+                    <div class="milo-3d-ring milo-ring-inner"></div>
+                    <div class="milo-core-orb">
+                        <div class="milo-core-bars">
                             <span></span>
                             <span></span>
                             <span></span>
@@ -1300,7 +1420,7 @@ def milo_chat_dialog():
                         </div>
                     </div>
                 </div>
-                <div class="milo-empty-tag">NEURAL ENGINE ONLINE</div>
+                <div class="milo-empty-tag">HOLOGRAPHIC RADAR ONLINE</div>
                 <div class="milo-empty-title">Hello! I'm MILO.</div>
                 <div class="milo-empty-sub">
                     Tap any quick-access mode above or type below to start chatting, writing code, or analyzing documents.
