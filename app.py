@@ -33,6 +33,7 @@ st.set_page_config(
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 VIDEO_PATH = STATIC_DIR / "milo_intro.mp4"
+VIDEO_ALT_PATH = STATIC_DIR / "milo_intro_2.mp4"
 MUSIC_PATH = STATIC_DIR / "milo_music.mp3"
 
 initialize_memory()
@@ -47,11 +48,12 @@ st.session_state.setdefault("quick_prompt", None)
 # ============================================================
 
 @st.cache_data(show_spinner=False)
-def get_video_source(video_path_str: str) -> str | None:
-    path = Path(video_path_str)
-    if not path.is_file():
-        return None
-    return "/app/static/milo_intro.mp4"
+def get_video_source(primary_path_str: str, alt_path_str: str) -> str | None:
+    for path_str in (primary_path_str, alt_path_str):
+        path = Path(path_str)
+        if path.is_file():
+            return f"/app/static/{path.name}"
+    return None
 
 
 @st.cache_data(show_spinner=False)
@@ -895,23 +897,30 @@ div[data-testid="stChatInput"] button:hover {
 
 
 # ============================================================
-# VIDEO BACKGROUND (CONTINUOUS LOOP)
+# VIDEO BACKGROUND (CONTINUOUS LOOP + CHROME AUTOPLAY TRIGGER)
 # ============================================================
 
-video_src = get_video_source(str(VIDEO_PATH))
+video_src = get_video_source(str(VIDEO_PATH), str(VIDEO_ALT_PATH))
 
 if video_src:
     st.html(f"""
     <div class="milo-background">
-        <video autoplay muted loop playsinline preload="auto">
-            <source src="{video_src}" type="video/mp4">
-        </video>
+        <video id="milo-bg-vid" src="{video_src}" autoplay muted loop playsinline preload="auto"></video>
         <div class="milo-overlay"></div>
     </div>
     """)
+    components.html("""
+    <script>
+        const vid = window.parent.document.getElementById("milo-bg-vid");
+        if (vid) {
+            vid.muted = true;
+            vid.play().catch(() => {});
+        }
+    </script>
+    """, height=0)
 else:
     st.sidebar.warning(
-        f"Background video not found: {VIDEO_PATH}"
+        f"Background video not found: {VIDEO_PATH} or {VIDEO_ALT_PATH}"
     )
 
 
